@@ -9,6 +9,10 @@ target/
 !**/src/test/**
 프로젝트 생성 옵션.txt
 의존성.txt
+cuni-0.0.1-SNAPSHOT.jar
+cuni-0.0.1-SNAPSHOT.jar.original
+cuni.zip
+사용자 메뉴얼.docx
 
 ### STS ###
 .apt_generated
