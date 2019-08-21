@@ -7,7 +7,6 @@
 <%@ include file="../part/head.jspf"%>
 <script>
 	var articleId = parseInt('${param.id}');
-	var loginedMemberId = ${loginedMemberId};
 </script>
 
 <script>
@@ -23,23 +22,12 @@
 		$tr.removeClass('edit-mode');
 	}
 </script>
-<script>
-	var loginedMemberPermmisionLevel = ${loginedMember.permissionLevel > 0 ? loginedMember.permissionLevel : 0};
-</script>
 
 <style>
-.deletable-item {
-	display: none;
-}
-.deletable .deletable-item {
-	display: block;
-}
 .editable-item {
 	display: none;
 }
-.deletable a.deletable-item, .editable a.editable-item {
-	display: inline-block;
-}
+
 .editable .editable-item {
 	display: block;
 }
@@ -123,7 +111,6 @@
 				<th>ID</th>
 				<th>등록날짜</th>
 				<th>내용</th>
-				<th>작성자</th>
 				<th>비고</th>
 			</tr>
 		</thead>

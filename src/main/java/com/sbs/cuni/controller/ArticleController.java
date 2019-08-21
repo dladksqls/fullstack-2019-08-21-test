@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sbs.cuni.dto.Article;
 import com.sbs.cuni.dto.ArticleReply;
 import com.sbs.cuni.dto.Board;
+import com.sbs.cuni.dto.Member;
 import com.sbs.cuni.service.ArticleService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -80,9 +81,30 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/article/add")
-	public String showAdd(long boardId, Model model) {
+	public String showAdd(long boardId, Model model, HttpServletRequest request) {
 		Board board = articleService.getBoard(boardId);
+		Member member = (Member) request.getAttribute("loginedMember");
 
+		String msg = "";
+
+		String redirectUrl = "";
+
+		long permissionLevel = 0;
+
+		if (boardId == 1) {
+			permissionLevel = member.getPermissionLevel();
+
+			if (permissionLevel != 1) {
+				msg = "공지사항에 게시할 권한이 없습니다.";
+
+				redirectUrl = "/";
+
+				model.addAttribute("alertMsg", msg);
+				model.addAttribute("redirectUrl", redirectUrl);
+
+				return "common/redirect";
+			}
+		}
 		model.addAttribute("board", board);
 
 		return "article/add";
@@ -155,13 +177,31 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/article/doDelete")
-	public String doDelete(Model model, @RequestParam Map<String, Object> param, HttpSession session, long id, long boardId) {
+	public String doDelete(Model model, @RequestParam Map<String, Object> param, HttpSession session, long id,
+			long boardId) {
 		param.put("id", id);
+		long loginedMemberId = (long) session.getAttribute("loginedMemberId");
+
+		Article article = articleService.getOne(param);
+
+		String msg = "";
+
+		String resultCode = "";
+
+		if ( loginedMemberId != article.getMemberId() ) {
+			msg = "삭제권한이 없습니다.";
+
+			model.addAttribute("alertMsg", msg);
+
+			model.addAttribute("historyBack", true);
+
+			return "common/redirect";
+		}
 
 		Map<String, Object> deleteRs = articleService.delete(param);
 
-		String msg = (String) deleteRs.get("msg");
-		String resultCode = (String) deleteRs.get("resultCode");
+		msg = (String) deleteRs.get("msg");
+		resultCode = (String) deleteRs.get("resultCode");
 
 		if (resultCode.startsWith("S-")) {
 			String redirectUrl = "/article/list?boardId=" + boardId;
@@ -225,15 +265,32 @@ public class ArticleController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		Map<String, Object> rs = new HashMap<>();
+		String msg = "";
+		String resultCode = "";
+
+		long loginedMemberId = (long) session.getAttribute("loginedMemberId");
+
+		ArticleReply ar = articleService.getReply(param);
+
+		if ( loginedMemberId != ar.getMemberId() ) {
+			msg = "댓글을 수정할 권한이 없습니다.";
+			resultCode = "F-5";
+
+			rs = Maps.of("msg", msg, "resultCode", resultCode);
+
+			return rs;
+		}
 
 		param.put("id", id);
 
 		Map<String, Object> updateRs = articleService.updateReply(param);
 
-		String msg = (String) updateRs.get("msg");
-		String resultCode = (String) updateRs.get("resultCode");
+		msg = (String) updateRs.get("msg");
+		resultCode = (String) updateRs.get("resultCode");
 
-		Map<String, Object> rs = Maps.of("msg", msg, "resultCode", resultCode);
+		rs = Maps.of("msg", msg, "resultCode", resultCode);
 
 		return rs;
 	}
