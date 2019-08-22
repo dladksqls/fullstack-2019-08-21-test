@@ -8,6 +8,8 @@ mybatis:
 server:
   port: 8083
 spring:
+  profiles:
+    active: local
   mvc:
     view:
       prefix: /WEB-INF/jsp/ 
@@ -15,7 +17,7 @@ spring:
   datasource:
     # driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/cuni?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/a4?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
     username: root
     password: ''
   servlet:
@@ -26,7 +28,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ryusystem100@gmail.com
+    username: RyuSystem100@gmail.com
     password: narumi12
     properties:
       mail:
@@ -34,3 +36,21 @@ spring:
           auth: true
           starttls:
             enable: true
+            
+            
+---
+
+spring:
+  profiles: local
+  
+---
+
+spring:
+  profiles: production
+datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/cuni_production?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: ''
+server:
+  port: 8087
